@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <div id="nav">
+    <div id="nav"> 
+      <h1> 系统信息监控</h1>
+            <router-link to="/cpu">CPU</router-link> |
+            <router-link to="/memory">Memory</router-link> |
+            <router-link to="/net">Network</router-link>
     </div>
     <router-view/>
   </div>

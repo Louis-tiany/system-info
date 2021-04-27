@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "push": "npm run build && scp -r scp -r dist/* root@117.78.4.26:/www"
+    "push": "npm run build &&  scp -r dist/ louis@59.110.63.1:~/service/www"
   },
   "dependencies": {
     "axios": "^0.21.1",

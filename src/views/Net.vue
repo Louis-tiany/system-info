@@ -17,14 +17,8 @@ export default {
             data: [],
             cpu_rate : [],
 
-            total_mem: null,
-            mem_used_rate: [],
-
-            total_disk: null,
-            disk_used_rate: [],
-            
-
-            value : 100,
+            BytesRXSecond: [],
+            BytesTXSecond: [],
         }
     },
 
@@ -39,11 +33,8 @@ export default {
 
         getDataFromRemote(){
             this.axios.get('http://59.110.63.1:8888/sys/info').then(res=>{
-                this.cpu_rate.push(res.data['cpu']['used_rate'])
-                this.mem_used_rate.push(res.data['memory']['used_rate'])
-                this.total_mem = res.data['memory']['total_memory']
-                this.disk_used_rate.push(res.data['disk']['used_rate'])
-                this.total_disk = res.data['disk']['total_disk']
+                this.BytesRXSecond.push(res.data['net']['BytesRXSecond'])
+                this.BytesTXSecond.push(res.data['net']['BytesTXSecond'])
             },error=>{
                 console.log(error);
             });
@@ -62,7 +53,10 @@ export default {
         draw(){
             let option = {
                 title: {
-                    text: 'CPU使用率'
+                    text: '网络使用情况'
+                },
+                legend:{
+                    data: ['接收速率Byte/s', '发送速率Byte/s']
                 },
                 tooltip: {
                     trigger: 'axis',
@@ -74,24 +68,22 @@ export default {
                         ' ' + params.data;
                     },
                     axisPointer: {
-                        animation: false
+                        animation: true
                     }
                 },
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
                     splitLine: {
-                        show: false
+                        show: true
                     },
                     data :this.date
                 },
                 yAxis: {
                     type: 'value',
-                    min: 0,
-                    max:100,
-                    boundaryGap: [0, '100%'],
+                    boundaryGap: false,
                     splitLine: {
-                        show: false
+                        show: true
                     }
                 },
                 dataZoom: [{
@@ -100,15 +92,20 @@ export default {
                     end: 100
                 }],
                 series: [{
-                    name: 'CPU数据',
+                    name: '接收速率Byte/s',
                     type: 'line',
                     showSymbol: false,
                     stack: 'a',
                     hoverAnimation: false,
-                    areaStyle : {
-                        normal: {}
-                    },
-                    data: this.cpu_rate
+                    data: this.BytesRXSecond
+                },
+                {
+                    name: '发送速率Byte/s',
+                    type: 'line',
+                    showSymbol: false,
+                    stack: 'a',
+                    hoverAnimation: false,
+                    data: this.BytesTXSecond
                 }]
             };
 
@@ -121,13 +118,17 @@ export default {
         this.init()
         setInterval(() => {
             for(var i = 0; i < 1; i++) {
-                this.cpu_rate.shift();
+                this.BytesRXSecond.shift();
+                this.BytesTXSecond.shift()
                 this.date.shift();
                 this.freshData();
             }
             this.Chart.setOption({
                 series:[{
-                    data: this.cpu_rate
+                    data: this.BytesRXSecond
+                },
+                {
+                    data: this.BytesTXSecond
                 }],
                 xAxis:{
                     data: this.date
